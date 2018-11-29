@@ -8,6 +8,10 @@ HttpRequest::HttpRequest() {};
 HttpRequest::HttpRequest(std::string req) {
     init(req);
 };
+
+void HttpRequest::setReq(std::string req){
+    init(req);
+}
 const std::string &HttpRequest::getMehtod() const {
     return mehtod;
 }

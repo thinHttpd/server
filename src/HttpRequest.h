@@ -94,7 +94,8 @@ private:
             /*vector<string> body;
             body.push_back(reqs[reqs.size() - 1]);
             res.insert(pair<string, vector<string>>("requestBody", body));*/
-
+        } else{
+            requsetBody = "";
         }
         return res;
     }
@@ -104,6 +105,8 @@ private:
 public:
     HttpRequest();
     HttpRequest(std::string req);
+
+    void setReq(std::string req);
 
     const std::string &getMehtod() const;
 
