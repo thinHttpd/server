@@ -8,11 +8,19 @@
 #include <map>
 #include <vector>
 #include "HttpRequest.h"
+#include "Response.h"
 #define QUEUE 20
 
 using namespace std;
 
-string index = "index.html";
+string idx = "index.html";
+
+void accept_request(int client);
+void cat(int client, FILE* resource);
+int recvline(int sock, char *buf, int size)
+string getRequest(int client);
+void print_error(const char* error_message);
+int create_connect(u_short* port);
 
 //请求处理
 void accept_request(int client)
@@ -32,67 +40,64 @@ void accept_request(int client)
 	//取请求方法
 	method = hr.getMethod();
 	//
-	url = hr.getUrl();
+	url = hr.getUri();
 	//
 	version = hr.getVersion();
 	//
-	map<string, vector<string>> headMap = getHeader();
+	map<string, vector<string>> headMap = hr.getHeader();
 	//不是GET请求就需要cgi	
 	if(strcmp(method,"GET") != 0)
 		cgi = 1;
 	else	
 	{
 		//有参数就请求cgi
-		if(hasQuery_string) cgi = 1;
+		//if(hasQuery_string) cgi = 1;
 	}
 	//拼接到htdocs的后面	
-	strcat(path, url);
+	sprintf(path, url);
 	
 	//假如path后是'/',需要寻找默认文件
-	if(path[strlen(path) - 1] == '/')
-		strcat(path, index);
+	if(path[path.length() - 1] == '/')
+		sprintf(path, "index.html");
 	//没找到文件
-	if(stat(path, &st) == -1) response(client,404);
+	if(stat(path, &st) == -1)
+	{
+		Response response(client,"404");
+		response.sendHttpHead();
+	}
 	else
 	{	
 		//如果是目录,尾部添加index.html
 		if((st.st_mode & S_IFMT) == S_IFDIR)
 		{
-			strcat(path, "/index.html");
-			if(stat(path, &st) == -1) response(client,404);
+			sprintf(path, "/index.html");
+			if(stat(path, &st) == -1)
+			{
+				Response response(client,"404");
+				response.sendHttpHead();
+			}
 		}
 		//如果是可执行文件，需要cgi
 		if((st.st_mode & S_IXUSR) || (st.st_mode & S_IXGRP) || (st.st_mode & S_IXOTH))
 			cgi = 1;
-		if(!cgi) response(client, 200, path);
+		if(!cgi)
+		{
+			Response response(client, "200");
+			response.sendHttpHead();
+		}
 		else //调用cgi	
 	}
 	//关闭连接
 	close(client);
 }
 
-//发送数据
-void send_file(int client, string path)
-{
-	FILE* resource = NULL;
-	
-	resource = fopen(path, "r");
-	if(resource == NULL) not_found(client);
-	else
-	{
-		//封装headers
-		//把文件信息读出并作为response的body返回给用户端
-		cat(client,resource);		
-	}
-	fclose(resource);
-}
 
 //读取文件
 void cat(int client, FILE* resource)
 {
 	char buf[1024];
 	fgets(buf, sizeof(buf), resource);
-	send(client, buf, strlen(buf), 0);	//为空也发送
+	send(client, buf, strlen(buf), 0);	
 	while(!feof(resource))
 	{
 		fgets(buf, sizeof(buf), resource);
@@ -174,7 +179,7 @@ int create_connect(u_short* port)
 		*port = ntohs(s_sockaddr.sin_port);
 	}
 
-	if(linten(ss, QUEUE) < 0) print_error("[-]error: listen failed!")；
+	if(linten(ss, QUEUE) < 0) print_error("[-]error: listen failed!");
 	
 	return ss;
 }
