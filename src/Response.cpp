@@ -8,11 +8,15 @@
 #include <cstdlib>
 
 using namespace std;
-Response::Response(int _client,string _state, const string _version)
+
+void noFound(int client , string version , string state);//404错误，找不到资源文件
+void msgSend(int client , char* _buf , string _msg);//发送信息小函数
+
+
+Response::Response(int _client,string _state,string _version="HTTP/1.1")
+:client(_client),state(_state),version(_version)
 {
-  client = _client;
-  state = _state;
-  version = _version;
+
     //ctor
 }
 
@@ -38,45 +42,21 @@ void Response::sendHttpHead()
 {
     //404,200
     char buf[1024];
-    // if(state == "404")
-    // {
-    //     string msg = version + state +"No Found\r\n";
-    //     sprintf(buf,msg.data());
-    //     send(client,buf,sizeof(buf),0);
-    //     sprintf(buf,"Content-type: text/html\r\n");
-    //     send(client,buf,sizeof(buf),0);
-    //     sprintf(buf,"Connection: keep-alive\r\n");
-    //     send(client,buf,sizeof(buf),0);
-    //     sprintf(buf,"\r\n");
-    //     send(client,buf,sizeof(buf),0);
-    //     sprintf(buf, "<P>404,not found ");
-    //     send(client, buf, sizeof(buf), 0);
-    // }
-    // else if(state == "200")
-    // {
-    //     string msg = version + state +"OKKK\r\n";
-    //     sprintf(buf,msg.data());
-    //     send(client,buf,sizeof(buf),0);
-    //     sprintf(buf,"Content-type:text/html\r\n");
-    //     send(client,buf,sizeof(buf),0);
-    //     sprintf(buf,"Connection: keep-alive\r\n");
-    //     send(client,buf,sizeof(buf),0);
-    //     sprintf(buf,"\r\n");
-    //     send(client,buf,sizeof(buf),0);
-    // }
-    cout << "[-]i ready to send!" << client <<endl;
-    sprintf(buf, "HTTP/1.1 200 OK\r\n");
-    send(client, buf, sizeof(buf), 0);
-    sprintf(buf,"Content-type: text/html\r\n");
-    send(client,buf,sizeof(buf),0);
-   // sprintf(buf,"Connection: keep-alive\r\n");
-       // send(client,buf,sizeof(buf),0);
+    if(state == "404")
+    {
+       noFound(client,version,state);
+    }
+    else if(state == "200")
+    {
+        string msg = version + " " + state + " " +"OKKK\r\n";
+        sprintf(buf,msg.c_str());
+        send(client,buf,sizeof(buf),0);
+        sprintf(buf,"Content-type:text/html\r\n");
+        send(client,buf,sizeof(buf),0);
         sprintf(buf,"\r\n");
         send(client,buf,sizeof(buf),0);
-        sprintf(buf, "<P>404,not found ");
-        send(client, buf, sizeof(buf), 0);
-        sprintf(buf,"\r\n");
-        send(client,buf,sizeof(buf),0);
+    }
+
 }
 
 /** @brief sendContext
@@ -97,4 +77,25 @@ void Response::sendContext(int client,FILE* file)
     }
 }
 
+void noFound(int client , string version , string state)//404错误，找不到资源文件
+{
+    char buf[1024];
+    string msg = version + " " + state + " " + "No Found\r\n";
+    sprintf(buf,msg.c_str());
+    send(client,buf,strlen(msg.c_str()),0);
+    msg = "Content-type:text/html\r\n\r\n";
+    sprintf(buf,msg.c_str());
+    send(client,buf,strlen(msg.c_str()),0);
+//    sprintf(buf,"\r\n");
+//    send(client,buf,sizeof(buf),0);
+//    msg = "<P>找不到资源哦 ";
+//    sprintf(buf,msg.c_str());
+//    send(client,buf,strlen(msg.c_str()),0);
+    msgSend(client, buf,"<P>找不到资源哦");
+}
 
+    void msgSend(int client, char* buf , string msg)//发送信息小函数
+{
+    sprintf(buf,msg.c_str());
+    send(client,buf,strlen(msg.c_str()),0);
+}
