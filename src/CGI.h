@@ -1,15 +1,15 @@
 #ifndef CGI_H
 #define CGI_H
 #include <string>
+#include "pthread.h"
 
 class CGI
 {
     public:
-        CGI();
-        virtual ~CGI();
-
+    	CGI(){};
+    	~CGI(){};
         CGI(std::string scriptName, std::string queryString);
-        CGI(std::string scriptName, std::string queryString, std::string m_contentLength);
+        char * run();
 
     protected:
         std::string m_scriptName;
