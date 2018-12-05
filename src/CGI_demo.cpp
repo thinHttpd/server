@@ -19,8 +19,9 @@ int main()
     string queryString = "var=1";
 
     CGI *test = new CGI(scriptName,fileName,requestUri,queryString);
-    
-    cout<< test->run() <<endl;
+    test->run();
+    cout<< test->getStatusCode() <<endl;
+    cout<< test->getOutput() <<endl;
     
     delete(test);
     

@@ -9,8 +9,9 @@ class CGI
     	CGI(){};
     	~CGI(){};
         CGI(std::string scriptName, std::string fileName, std::string requestUri, std::string queryString);
-        char * run();
-        std::string exec(const char* cmd);
+        void run();
+        char * getOutput();
+        int getStatusCode();
 
     protected:
         std::string m_scriptName;
@@ -22,6 +23,9 @@ class CGI
 
     private:
         void put2env(std::string msg);
+        std::string exec(const char* cmd);
+        char * m_output;
+        int m_statusCode;
 };
 
 #endif // CGI_H

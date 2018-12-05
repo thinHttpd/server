@@ -5,14 +5,11 @@
 
 CGI::CGI(std::string scriptName, std::string fileName, std::string requestUri, std::string queryString)
 {
+    // 记录必要参数，方便多次利用（可以看作CGI的上下文
     this->m_scriptName = scriptName;
     this->m_fileName = fileName;
     this->m_requestUri = requestUri;
     this->m_queryString = queryString;
-}
-
-char * CGI::run()
-{
 
     // 设置 QUERY_STRING 环境变量
     CGI::put2env("QUERY_STRING=" + this->m_queryString);
@@ -26,8 +23,12 @@ char * CGI::run()
     // 设置 SCRIPT_FILENAME
     CGI::put2env("SCRIPT_FILENAME=" + this->m_fileName);
 
-    std::string cmd = "php-cgi";
+}
 
+void CGI::run()
+{
+
+    std::string cmd = "php-cgi";
 
     char *path = new char(strlen(cmd.c_str()));
     strcpy(path,cmd.c_str());
@@ -38,13 +39,17 @@ char * CGI::run()
     
     strcpy(resultChar,resultString.c_str());
 
-    return resultChar;
+    this->m_output = resultChar;
 
 }
 
 std::string CGI::exec(const char* cmd) {
     FILE* pipe = popen(cmd, "r");
-    if (!pipe) return "error!";
+    if (!pipe){
+        // 和 CGI 对接方面出问题，返回 502
+        this->m_statusCode = 502;
+        return "\r\n thinHttpd CGI error!";
+    }
     
     char buf[1024];
     std::string result = "";
@@ -54,6 +59,7 @@ std::string CGI::exec(const char* cmd) {
             result += buf;
     }
 
+    this->m_statusCode = 200;
     pclose(pipe);
     return result;
 }
@@ -62,4 +68,12 @@ void CGI::put2env(std::string msg) {
     char buf[1024];
     sprintf(buf,"%s",msg.c_str());
     putenv(buf);
+}
+
+int CGI::getStatusCode(){
+    return this->m_statusCode;
+}
+
+char * CGI::getOutput(){
+    return this->m_output;
 }
