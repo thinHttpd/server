@@ -8,6 +8,20 @@ HttpRequest::HttpRequest() {};
 HttpRequest::HttpRequest(std::string req) {
     init(req);
 };
+/**
+ * 判断uri是否要请求资源
+ * @return
+ */
+bool HttpRequest::hasSource() {
+    using namespace std;
+    string tmp = this->getUri();
+    std::vector<string> res;
+    splitString(uri,res,"?");
+    if(res.size() < 2){
+        return false;
+    }
+    return true;
+};
 
 void HttpRequest::setReq(std::string req){
     init(req);
