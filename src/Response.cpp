@@ -67,27 +67,27 @@ void Response::sendContext(FILE* file , long length , string type)//从文件描
 {
     char buf[409600];
     msgSend(client,buf,"Connection: keep-alive\r\n");
-    if(type.compare("html"))//HTML格式
+    if(type.compare("html")==0)//HTML格式
     {
         msgSend(client,buf,"Content-type: text/html; charset=utf-8\r\n");
     }
-    else if(type.compare("plain"))//纯文本格式
+    else if(type.compare("plain")==0)//纯文本格式
     {
         msgSend(client,buf,"Content-type: text/plain; charset=utf-8\r\n");
     }
-    else if(type.compare("xml"))//XML格式
+    else if(type.compare("xml")==0)//XML格式
     {
         msgSend(client,buf,"Content-type: text/xml; charset=utf-8\r\n");
     }
-    else if(type.compare("gif"))//gif图片格式
+    else if(type.compare("gif")==0)//gif图片格式
     {
         msgSend(client,buf,"Content-type: image/gif\r\n");
     }
-    else if(type.compare("jpeg"))//jpg图片格式
+    else if(type.compare("jpeg")==0)//jpg图片格式
     {
         msgSend(client,buf,"Content-type: image/jpeg\r\n");
     }
-    else if(type.compare("png"))//png图片格式
+    else if(type.compare("png")==0)//png图片格式
     {
         msgSend(client,buf,"Content-type: image/png\r\n");
     }
@@ -114,7 +114,7 @@ void noFound(int client , string version , string state)//404错误，找不到�
     msgSend(client,buf,"Connection: keep-alive\r\n");
     string msg = version + " " + state + " No Found\r\n";
     msgSend(client, buf, msg);
-    msgSend(client,buf,"Content-type:text/html\r\n");
+    msgSend(client,buf,"Content-type:text/html; charset=utf-8\r\n");
     msgSend(client,buf,"\r\n");
 //    sprintf(buf,"\r\n");
 //    send(client,buf,sizeof(buf),0);
@@ -127,12 +127,8 @@ void noFound(int client , string version , string state)//404错误，找不到�
 void ok(int client , string version , string state)//200，正常返回信息
 {
     char buf[1024];
-    msgSend(client,buf,"Connection: keep-alive\r\n");
     string msg = version + " " + state + " " +"OKKK\r\n";
     msgSend(client,buf,msg);
-    msgSend(client,buf,"Content-type:text/html\r\n");
-    msgSend(client,buf,"\r\n");
-    msgSend(client, buf,"<P>服务器出现故障，请稍后再试");
 }
 
 void inetServerError(int client , string version , string state)//最常见的服务器端错误
@@ -141,7 +137,7 @@ void inetServerError(int client , string version , string state)//最常见的�
     msgSend(client,buf,"Connection: keep-alive\r\n");
     string msg = version + " " + state + " " +"Internal Server Error\r\n";
     msgSend(client,buf,msg);
-    msgSend(client,buf,"Content-type:text/html\r\n");
+    msgSend(client,buf,"Content-type:text/html; charset=utf-8\r\n");
     msgSend(client,buf,"\r\n");
 }
 
