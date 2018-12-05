@@ -66,27 +66,28 @@ void Response::sendHttpHead()//返回头部
 void Response::sendContext(FILE* file , long length , string type)//从文件描述符中读取指定内容
 {
     char buf[409600];
-    if(type.compare("text/html"))//HTML格式
+    msgSend(client,buf,"Connection: keep-alive\r\n");
+    if(type.compare("html"))//HTML格式
     {
         msgSend(client,buf,"Content-type: text/html; charset=utf-8\r\n");
     }
-    else if(type.compare("text/plain"))//纯文本格式
+    else if(type.compare("plain"))//纯文本格式
     {
         msgSend(client,buf,"Content-type: text/plain; charset=utf-8\r\n");
     }
-    else if(type.compare("text/xml"))//XML格式
+    else if(type.compare("xml"))//XML格式
     {
         msgSend(client,buf,"Content-type: text/xml; charset=utf-8\r\n");
     }
-    else if(type.compare("image/gif"))//gif图片格式
+    else if(type.compare("gif"))//gif图片格式
     {
         msgSend(client,buf,"Content-type: image/gif\r\n");
     }
-    else if(type.compare("image/jpeg"))//jpg图片格式
+    else if(type.compare("jpeg"))//jpg图片格式
     {
         msgSend(client,buf,"Content-type: image/jpeg\r\n");
     }
-    else if(type.compare("image/png"))//png图片格式
+    else if(type.compare("png"))//png图片格式
     {
         msgSend(client,buf,"Content-type: image/png\r\n");
     }
