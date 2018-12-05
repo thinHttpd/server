@@ -111,6 +111,7 @@ void Response::sendContext(FILE* file , long length , string type)//从文件描
 void noFound(int client , string version , string state)//404错误，找不到资源文件
 {
     char buf[1024];
+    msgSend(client,buf,"Connection: keep-alive\r\n");
     string msg = version + " " + state + " No Found\r\n";
     msgSend(client, buf, msg);
     msgSend(client,buf,"Content-type:text/html\r\n");
@@ -126,6 +127,7 @@ void noFound(int client , string version , string state)//404错误，找不到�
 void ok(int client , string version , string state)//200，正常返回信息
 {
     char buf[1024];
+    msgSend(client,buf,"Connection: keep-alive\r\n");
     string msg = version + " " + state + " " +"OKKK\r\n";
     msgSend(client,buf,msg);
     msgSend(client,buf,"Content-type:text/html\r\n");
@@ -136,6 +138,7 @@ void ok(int client , string version , string state)//200，正常返回信息
 void inetServerError(int client , string version , string state)//最常见的服务器端错误
 {
     char buf[1024];
+    msgSend(client,buf,"Connection: keep-alive\r\n");
     string msg = version + " " + state + " " +"Internal Server Error\r\n";
     msgSend(client,buf,msg);
     msgSend(client,buf,"Content-type:text/html\r\n");
