@@ -96,6 +96,9 @@ void noFound(int client , string version , string state)//404´íÎó£¬ÕÒ²»µ½×ÊÔ´ÎÄ¼
     msgSend(client, buf,"<P>ÕÒ²»µ½×ÊÔ´Å¶");
 }
 
+void OK()
+
+
     void msgSend(int client, char* buf , string msg)//·¢ËÍĞÅÏ¢Ğ¡º¯Êı
 {
     sprintf(buf,msg.c_str());

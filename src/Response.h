@@ -2,7 +2,7 @@
 #define RESPONSE_H
 #include <stdio.h>
 #include <iostream>
-#include <socket.h>
+#include <sys/socket.h>
 #include <strings.h>
 #include <string.h>
 #include <sys/stat.h>
