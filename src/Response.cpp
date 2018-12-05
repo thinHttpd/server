@@ -67,28 +67,30 @@ void Response::sendContext(FILE* file , long length , string type)//从文件描
 {
     char buf[409600];
     msgSend(client,buf,"Connection: keep-alive\r\n");
-    msgSend(client,buf,"Content-Length: %ld\r\n",length);
-    if(type.compare("html")==0)//HTML格式
+//    msgSend(client,buf,"Content-Length: %ld\r\n",length);
+    sprintf(buf,"Content-Length: %ld\r\n",length);
+    send(client,buf,strlen(buf),0);
+    if(type == "html")//HTML格式
     {
         msgSend(client,buf,"Content-type: text/html; charset=utf-8\r\n");
     }
-    else if(type.compare("plain")==0)//纯文本格式
+    else if(type =="plain")//纯文本格式
     {
         msgSend(client,buf,"Content-type: text/plain; charset=utf-8\r\n");
     }
-    else if(type.compare("xml")==0)//XML格式
+    else if(type == "xml")//XML格式
     {
         msgSend(client,buf,"Content-type: text/xml; charset=utf-8\r\n");
     }
-    else if(type.compare("gif")==0)//gif图片格式
+    else if(type == "gif")//gif图片格式
     {
         msgSend(client,buf,"Content-type: image/gif\r\n");
     }
-    else if(type.compare("jpeg")==0)//jpg图片格式
+    else if(type == "jpeg")//jpg图片格式
     {
         msgSend(client,buf,"Content-type: image/jpeg\r\n");
     }
-    else if(type.compare("png")==0)//png图片格式
+    else if(type == "png")//png图片格式
     {
         msgSend(client,buf,"Content-type: image/png\r\n");
     }
