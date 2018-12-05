@@ -1,4 +1,4 @@
-ï»¿#include "Response.h"
+#include "Response.h"
 #include <stdio.h>
 #include <iostream>
 #include <sys/socket.h>
@@ -9,8 +9,8 @@
 
 using namespace std;
 
-void noFound(int client , string version , string state);//404é”™è¯¯ï¼Œæ‰¾ä¸åˆ°èµ„æºæ–‡ä»¶
-void msgSend(int client , char* _buf , string _msg);//å‘é€ä¿¡æ¯å°å‡½æ•°
+void noFound(int client , string version , string state);//404´íÎó£¬ÕÒ²»µ½×ÊÔ´ÎÄ¼ş
+void msgSend(int client , char* _buf , string _msg);//·¢ËÍĞÅÏ¢Ğ¡º¯Êı
 
 
 Response::Response(int _client,string _state,string _version)
@@ -32,6 +32,7 @@ Response::~Response()
   */
 /*void Response::sendHttpState()
 {
+
 }*/
 
 /** @brief sendHttpHead
@@ -67,7 +68,7 @@ void Response::sendContext(FILE* file)
 {
     char buf[1024];
 
-    //ä»æ–‡ä»¶æè¿°ç¬¦ä¸­è¯»å–æŒ‡å®šå†…å®¹
+    //´ÓÎÄ¼şÃèÊö·ûÖĞ¶ÁÈ¡Ö¸¶¨ÄÚÈİ
     fgets(buf,sizeof(buf),file);
 
     while(!feof(file))
@@ -77,7 +78,7 @@ void Response::sendContext(FILE* file)
     }
 }
 
-void noFound(int client , string version , string state)//404é”™è¯¯ï¼Œæ‰¾ä¸åˆ°èµ„æºæ–‡ä»¶
+void noFound(int client , string version , string state)//404´íÎó£¬ÕÒ²»µ½×ÊÔ´ÎÄ¼ş
 {
     char buf[1024];
     string msg = version + " " + state + " No Found\r\n";
@@ -89,13 +90,13 @@ void noFound(int client , string version , string state)//404é”™è¯¯ï¼Œæ‰¾ä¸åˆ°è
     msgSend(client,buf,"\r\n");
 //    sprintf(buf,"\r\n");
 //    send(client,buf,sizeof(buf),0);
-//    msg = "<P>æ‰¾ä¸åˆ°èµ„æºå“¦ ";
+//    msg = "<P>ÕÒ²»µ½×ÊÔ´Å¶ ";
 //    sprintf(buf,msg.c_str());
 //    send(client,buf,strlen(msg.c_str()),0);
-    msgSend(client, buf,"<P>æ‰¾ä¸åˆ°èµ„æºå“¦");
+    msgSend(client, buf,"<P>ÕÒ²»µ½×ÊÔ´Å¶");
 }
 
-    void msgSend(int client, char* buf , string msg)//å‘é€ä¿¡æ¯å°å‡½æ•°
+    void msgSend(int client, char* buf , string msg)//·¢ËÍĞÅÏ¢Ğ¡º¯Êı
 {
     sprintf(buf,msg.c_str());
     send(client,buf,strlen(msg.c_str()),0);

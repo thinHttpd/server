@@ -12,11 +12,19 @@ using namespace std;
 class Response
 {
     public:
+<<<<<<< HEAD
         Response(int client,string state, const string version = "HTTP/1.1");//构造函数
         virtual ~Response();//初始化函数
         void sendHttpHead();//返回头部
         //void sendHttpState();//返回状态
         void sendContext(int client,FILE* file);//返回内容
+=======
+        Response(int client,string state,const string version = "HTTP/1.1");//构造函数
+        virtual ~Response();//初始化函数
+        void sendHttpHead();//返回头部
+        //void sendHttpState();//返回状态
+        void sendContext(FILE* file , long length , string type);//返回内容
+>>>>>>> 38f844daef3adaddee6cfb803670ea2998149495
     protected:
     private:
         int client;
