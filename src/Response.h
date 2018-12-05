@@ -1,4 +1,4 @@
-#ifndef RESPONSE_H
+ï»¿#ifndef RESPONSE_H
 #define RESPONSE_H
 #include <stdio.h>
 #include <iostream>
@@ -12,11 +12,11 @@ using namespace std;
 class Response
 {
     public:
-        Response(int client,string state, const string version = "HTTP/1.1");//¹¹Ôìº¯Êı
-        virtual ~Response();//³õÊ¼»¯º¯Êı
-        void sendHttpHead();//·µ»ØÍ·²¿
-        //void sendHttpState();//·µ»Ø×´Ì¬
-        void sendContext(int client,FILE* file);//·µ»ØÄÚÈİ
+        Response(int client,string state, const string version = "HTTP/1.1");//æ„é€ å‡½æ•°
+        virtual ~Response();//åˆå§‹åŒ–å‡½æ•°
+        void sendHttpHead();//è¿”å›å¤´éƒ¨
+        //void sendHttpState();//è¿”å›çŠ¶æ€
+        void sendContext(int client,FILE* file);//è¿”å›å†…å®¹
     protected:
     private:
         int client;

@@ -12,6 +12,7 @@
 #include <vector>
 #include "HttpRequest.h"
 #include "Response.h"
+#include "CGI.h"
 #define QUEUE 20
 
 using namespace std;
@@ -54,8 +55,7 @@ void accept_request(int client)
 		cgi = 1;
 	else	
 	{
-		//有参数就请求cgi
-		//if(hasQuery_string) cgi = 1;
+
 	}
 	//拼接到htdocs的后面	
 	path += url;
