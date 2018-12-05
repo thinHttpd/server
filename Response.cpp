@@ -64,7 +64,7 @@ void Response::sendHttpHead()
   *
   * @todo: document this function
   */
-void Response::sendContext(int client,FILE* file)
+void Response::sendContext(FILE* file)
 {
     char buf[1024];
 
@@ -81,12 +81,13 @@ void Response::sendContext(int client,FILE* file)
 void noFound(int client , string version , string state)//404错误，找不到资源文件
 {
     char buf[1024];
-    string msg = version + " " + state + " " + "No Found\r\n";
+    string msg = version + " " + state + " No Found\r\n";
     sprintf(buf,msg.c_str());
     send(client,buf,strlen(msg.c_str()),0);
-    msg = "Content-type:text/html\r\n\r\n";
+    msg = "Content-type:text/html\r\n";
     sprintf(buf,msg.c_str());
     send(client,buf,strlen(msg.c_str()),0);
+    msgSend(client,buf,"\r\n");
 //    sprintf(buf,"\r\n");
 //    send(client,buf,sizeof(buf),0);
 //    msg = "<P>找不到资源哦 ";
