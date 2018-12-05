@@ -67,6 +67,7 @@ void Response::sendContext(FILE* file , long length , string type)//从文件描
 {
     char buf[409600];
     msgSend(client,buf,"Connection: keep-alive\r\n");
+    msgSend(client,buf,"Content-Length: %ld\r\n",length);
     if(type.compare("html")==0)//HTML格式
     {
         msgSend(client,buf,"Content-type: text/html; charset=utf-8\r\n");
@@ -91,8 +92,6 @@ void Response::sendContext(FILE* file , long length , string type)//从文件描
     {
         msgSend(client,buf,"Content-type: image/png\r\n");
     }
-
-    msgSend(client,buf,"Content-Length: %ld\r\n",length);
     msgSend(client,buf,"\r\n");
 
     while(length>0)
@@ -111,9 +110,9 @@ void Response::sendContext(FILE* file , long length , string type)//从文件描
 void noFound(int client , string version , string state)//404错误，找不到资源文件
 {
     char buf[1024];
-    msgSend(client,buf,"Connection: keep-alive\r\n");
     string msg = version + " " + state + " No Found\r\n";
     msgSend(client, buf, msg);
+    msgSend(client,buf,"Connection: keep-alive\r\n");
     msgSend(client,buf,"Content-type:text/html; charset=utf-8\r\n");
     msgSend(client,buf,"\r\n");
 //    sprintf(buf,"\r\n");
@@ -134,15 +133,15 @@ void ok(int client , string version , string state)//200，正常返回信息
 void inetServerError(int client , string version , string state)//最常见的服务器端错误
 {
     char buf[1024];
-    msgSend(client,buf,"Connection: keep-alive\r\n");
     string msg = version + " " + state + " " +"Internal Server Error\r\n";
     msgSend(client,buf,msg);
+    msgSend(client,buf,"Connection: keep-alive\r\n");
     msgSend(client,buf,"Content-type:text/html; charset=utf-8\r\n");
     msgSend(client,buf,"\r\n");
 }
 
     void msgSend(int client, char* buf , string msg,int length)//发送信息小函数
 {
-    sprintf(buf,msg.c_str());
-    send(client,buf,strlen(msg.c_str()),length);
+    sprintf(buf,msg.c_str(),length);
+    send(client,buf,strlen(msg.c_str()),0);
 }
