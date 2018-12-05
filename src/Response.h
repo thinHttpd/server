@@ -16,7 +16,7 @@ class Response
         virtual ~Response();//初始化函数
         void sendHttpHead();//返回头部
         //void sendHttpState();//返回状态
-        void sendContext(FILE* file);//返回内容
+        void sendContext(FILE* file , long length , string type);//返回内容
     protected:
     private:
         int client;

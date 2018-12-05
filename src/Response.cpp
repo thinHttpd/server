@@ -9,7 +9,7 @@
 
 using namespace std;
 
-void msgSend(int client , char* _buf , string _msg);//发送信息小函数
+void msgSend(int client , char* _buf , string _msg,int length = 0);//发送信息小函数
 void noFound(int client , string version , string state);//404错误，找不到资源文件
 void ok(int client , string version , string state);//200，正常返回信息
 void inetServerError(int client , string version , string state);//最常见的服务器端错误
@@ -63,18 +63,48 @@ void Response::sendHttpHead()//返回头部
   *
   * @todo: document this function
   */
-void Response::sendContext(FILE* file)
+void Response::sendContext(FILE* file , long length , string type)//从文件描述符中读取指定内容
 {
-    char buf[1024];
-
-    //从文件描述符中读取指定内容
-    fgets(buf,sizeof(buf),file);
-
-    while(!feof(file))
+    char buf[409600];
+    if(type.compare("text/html"))//HTML格式
     {
-        send(client,buf,strlen(buf),0);
-        fgets(buf,sizeof(buf),file);
+        msgSend(client,buf,"Content-type: text/html; charset=utf-8\r\n");
     }
+    else if(type.compare("text/plain"))//纯文本格式
+    {
+        msgSend(client,buf,"Content-type: text/plain; charset=utf-8\r\n");
+    }
+    else if(type.compare("text/xml"))//XML格式
+    {
+        msgSend(client,buf,"Content-type: text/xml; charset=utf-8\r\n");
+    }
+    else if(type.compare("image/gif"))//gif图片格式
+    {
+        msgSend(client,buf,"Content-type: image/gif\r\n");
+    }
+    else if(type.compare("image/jpeg"))//jpg图片格式
+    {
+        msgSend(client,buf,"Content-type: image/jpeg\r\n");
+    }
+    else if(type.compare("image/png"))//png图片格式
+    {
+        msgSend(client,buf,"Content-type: image/png\r\n");
+    }
+
+    msgSend(client,buf,"Content-Length: %ld\r\n",length);
+    msgSend(client,buf,"\r\n");
+
+    while(length>0)
+    {
+        int i = 0;
+        for(i=0;i<409600||length>0;i++)
+        {
+            buf[i] = fgetc(file);
+            length--;
+        }
+        send(client,buf,(i+1),0);
+    }
+
 }
 
 void noFound(int client , string version , string state)//404错误，找不到资源文件
@@ -111,8 +141,8 @@ void inetServerError(int client , string version , string state)//最常见的�
     msgSend(client,buf,"\r\n");
 }
 
-    void msgSend(int client, char* buf , string msg)//发送信息小函数
+    void msgSend(int client, char* buf , string msg,int length)//发送信息小函数
 {
     sprintf(buf,msg.c_str());
-    send(client,buf,strlen(msg.c_str()),0);
+    send(client,buf,strlen(msg.c_str()),length);
 }
