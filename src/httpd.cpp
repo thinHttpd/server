@@ -19,7 +19,7 @@ using namespace std;
 string idx = "index.html";
 
 void accept_request(int client);
-void cat(int client, FILE* resource);
+void cat(int client, const char* path);
 int recvline(int sock, char *buf, int size);
 void getRequest(int client, string& buff);
 void print_error(const char* error_message);
@@ -63,7 +63,7 @@ void accept_request(int client)
 	//假如path后是'/',需要寻找默认文件
 	if(path[path.length() - 1] == '/')
 		path += idx;
-	char* p = (char*)path.data();
+	const char* p = path.data();
 	//没找到文件
 	if(stat(p, &st) == -1)
 	{
@@ -76,7 +76,7 @@ void accept_request(int client)
 		if((st.st_mode & S_IFMT) == S_IFDIR)
 		{
 			path = path + "/" + idx;
-			p = (char*)path.data();
+			p = path.data();
 			if(stat(p, &st) == -1)
 			{
 				Response response(client, state_code);
@@ -88,13 +88,13 @@ void accept_request(int client)
 			cgi = 1;
 		if(!cgi)
 		{
-			state_code = "200";
-			Response response(client, state_code);
-			response.sendHttpHead();
+			cat(client, p);
 		}
 		else
 		{
 			//调用cgi	
+			cout << "[-]cgi diao!" << endl;
+			cat(client, p);
 		}
 	}
 	cout << "[-]i will close client!" <<endl;
@@ -104,16 +104,24 @@ void accept_request(int client)
 
 
 //读取文件
-void cat(int client, FILE* resource)
+void cat(int client, const char* p)
 {
-	char buf[1024];
-	fgets(buf, sizeof(buf), resource);
-	send(client, buf, strlen(buf), 0);	
-	while(!feof(resource))
+	FILE* resource = NULL;
+	string state_code = "404";
+	resource = fopen(p, "r");
+	if(resource == NULL)
 	{
-		fgets(buf, sizeof(buf), resource);
-		send(client, buf, strlen(buf), 0);
+		Response response(client, state_code);
+		response.sendHttpHead();
 	}
+	else
+	{
+		state_code = "200";
+		Response response(client, state_code);
+		response.sendHttpHead();
+		response.sendContext(resource);
+	}	
+
 }
 
 //取得一行请求数据
