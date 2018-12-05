@@ -107,8 +107,8 @@ public:
     HttpRequest(std::string req);
 
     void setReq(std::string req);
-    bool hasSource();
-    const std::string &getMehtod() const;
+
+    const std::string &getMethod() const;
 
     const std::string &getVersion() const;
 
