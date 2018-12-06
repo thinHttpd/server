@@ -1,2 +1,4 @@
 <?php 
-echo "PHP: ".PHP_VERSION,"\n";
+for ($i=0; $i < 900; $i++) { 
+	echo "1";
+}
