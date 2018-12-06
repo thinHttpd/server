@@ -1,5 +1,6 @@
 #include <sys/socket.h>
-//#include <sys/types.h>
+#include <pthread.h>
+#include <fstream>
 #include <unistd.h>
 #include <sys/stat.h>
 #include <arpa/inet.h>
@@ -12,15 +13,21 @@
 #include <vector>
 #include "HttpRequest.h"
 #include "Response.h"
-#include "CGI.h"
 #define QUEUE 20
 
 using namespace std;
 
 string idx = "index.html";
 
+struct files
+{
+	int client;
+	const char* path;
+};
+
 void accept_request(int client);
-void cat(int client, const char* path);
+void *cat(void* data);
+void dog(int client, const char* path);
 int recvline(int sock, char *buf, int size);
 void getRequest(int client, string& buff);
 void print_error(const char* error_message);
@@ -37,7 +44,9 @@ void accept_request(int client)
 	string path = "htdocs";
 	int content_length = 0;
 	struct stat st;		//检测文件是否存在结构体
-	string state_code = "404";
+	pthread_t thread;
+	struct files fout;
+	//string state_code = "404";
 	//读取用户端发来的请求数据
 	getRequest(client, buff);
 	cout << buff << endl;
@@ -55,7 +64,8 @@ void accept_request(int client)
 		cgi = 1;
 	else	
 	{
-
+		//有参数就请求cgi
+		//if(hasQuery_string) cgi = 1;
 	}
 	//拼接到htdocs的后面	
 	path += url;
@@ -67,20 +77,26 @@ void accept_request(int client)
 	//没找到文件
 	if(stat(p, &st) == -1)
 	{
-		Response response(client, state_code);
+		Response response(client, "404");
 		response.sendHttpHead();
+		cout << "[-]i will close client!" <<endl;
+	//关闭连接
+	close(client);
 	}
 	else
 	{	
-		//如果是目录,尾部添加index.html
+		//如果是目录,尾部添加/index.html
 		if((st.st_mode & S_IFMT) == S_IFDIR)
 		{
 			path = path + "/" + idx;
 			p = path.data();
 			if(stat(p, &st) == -1)
 			{
-				Response response(client, state_code);
+				Response response(client, "404");
 				response.sendHttpHead();
+				cout << "[-]i will close client!" <<endl;
+				//关闭连接
+				close(client);
 			}
 		}
 		//如果是可执行文件，需要cgi
@@ -88,27 +104,35 @@ void accept_request(int client)
 			cgi = 1;
 		if(!cgi)
 		{
-			cat(client, p);
+			// fout.client = client;
+			// fout.path = p;
+			// int ret_thrd = pthread_create(&thread, NULL, cat, (void*)&fout);
+			// if(ret_thrd != 0)
+			// 	print_error("[-]thread error!");
+			dog(client, p);
 		}
 		else
 		{
 			//调用cgi	
 			cout << "[-]cgi diao!" << endl;
-			cat(client, p);
+			fout.client = client;
+			fout.path = p;
+			int ret_thrd = pthread_create(&thread, NULL, cat, (void*)&fout);
+			if(ret_thrd != 0)
+				print_error("[-]thread error!");
+			//dog(client, p);
 		}
 	}
-	cout << "[-]i will close client!" <<endl;
-	//关闭连接
-	close(client);
+	
 }
 
 
-//读取文件
-void cat(int client, const char* p)
+//发送文件
+void dog(int client, const char* path)
 {
 	FILE* resource = NULL;
 	string state_code = "404";
-	resource = fopen(p, "r");
+	resource = fopen(path, "rb");
 	if(resource == NULL)
 	{
 		Response response(client, state_code);
@@ -116,12 +140,47 @@ void cat(int client, const char* p)
 	}
 	else
 	{
+		fseek(resource,0,SEEK_END);
+		long n = ftell(resource);	//获取文件长度
+		fseek(resource,0,SEEK_SET);
 		state_code = "200";
 		Response response(client, state_code);
 		response.sendHttpHead();
-		response.sendContext(resource);
+		response.sendContext(resource, n, "html");
 	}	
+	fclose(resource);
+	cout << "[-]i will close client!" <<endl;
+	//关闭连接
+	close(client);
+}
 
+//发送文件
+void *cat(void* data)
+{
+	cout << "[-]thread is sending" << endl;
+	struct files *fout = (struct files*) data;
+	FILE* resource = NULL;
+	string state_code = "404";
+	resource = fopen(fout->path, "rb");
+	if(resource == NULL)
+	{
+		Response response(fout->client, state_code);
+		response.sendHttpHead();
+	}
+	else
+	{
+		fseek(resource,0,SEEK_END);
+		long n = ftell(resource);	//获取文件长度
+		fseek(resource,0,SEEK_SET);
+		state_code = "200";
+		Response response(fout->client, state_code);
+		response.sendHttpHead();
+		response.sendContext(resource, n, "html");
+	}	
+	fclose(resource);
+	cout << "[-]i will close client" << fout->client << "!" <<endl;
+	//关闭连接
+	close(fout->client);
 }
 
 //取得一行请求数据
@@ -211,7 +270,7 @@ int main()
 	struct sockaddr_in c_sockaddr;
 	socklen_t c_sockaddr_len;
 	bzero(&c_sockaddr_len, sizeof(c_sockaddr));
-	u_short port = 8085;
+	u_short port = 8082;
 	
 	httpd = create_connect(&port);  //建立连接
 	cout << "[+]success: httpd running on port " << port << endl;
