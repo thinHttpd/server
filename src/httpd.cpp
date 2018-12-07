@@ -113,14 +113,14 @@ void accept_request(int client)
 		}
 		else
 		{
-			//调用cgi	
-			cout << "[-]cgi diao!" << endl;
-			fout.client = client;
-			fout.path = p;
-			int ret_thrd = pthread_create(&thread, NULL, cat, (void*)&fout);
-			if(ret_thrd != 0)
-				print_error("[-]thread error!");
-			//dog(client, p);
+			// //调用cgi	
+			// cout << "[-]cgi diao!" << endl;
+			// fout.client = client;
+			// fout.path = p;
+			// int ret_thrd = pthread_create(&thread, NULL, cat, (void*)&fout);
+			// if(ret_thrd != 0)
+			// 	print_error("[-]thread error!");
+			dog(client, p);
 		}
 	}
 	
@@ -282,7 +282,18 @@ int main()
 		if(client_sock == -1)
 			print_error("[-]error: accept error!");
 		cout << "[+]success: accept a request!" << endl;
-		accept_request(client_sock);
+
+		int pid = fork();
+		if (pid == 0)
+		{
+			accept_request(client_sock);
+			exit(0);
+		}
+		else {
+			printf("[+]create a new thread for %d \n",client_sock);
+		}
+
+		
 	}
 	close(httpd);
 	return 0;	

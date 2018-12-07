@@ -64,8 +64,9 @@ void Response::sendHttpHead()//返回头部
   */
 void Response::sendContext(FILE* file , long length , string type)//从文件描述符中读取指定内容
 {
-    char buf[409600];
-    msgSend(client,buf,"Connection: keep-alive\r\n");
+    char buf[4096];
+
+    msgSend(client,buf,"Connection: close\r\n");
 //    msgSend(client,buf,"Content-Length: %ld\r\n",length);
     sprintf(buf,"Content-Length: %ld\r\n",length);
     send(client,buf,strlen(buf),0);
@@ -85,7 +86,7 @@ void Response::sendContext(FILE* file , long length , string type)//从文件描
     {
         msgSend(client,buf,"Content-type: image/gif\r\n");
     }
-    else if(type == "jpeg")//jpg图片格式
+    else if(type == "jpg")//jpg图片格式
     {
         msgSend(client,buf,"Content-type: image/jpeg\r\n");
     }
@@ -94,17 +95,22 @@ void Response::sendContext(FILE* file , long length , string type)//从文件描
         msgSend(client,buf,"Content-type: image/png\r\n");
     }
     msgSend(client,buf,"\r\n");
-    cout << "[-]file length........" << length << endl;
+    cout << "[+]file length........" << length << endl;
+
+    // 文件主体内容分包发送，不然浏览器等待太长
+
     while(length>0)
     {
         int i = 0;
-        for(i=0;i<409600||length>0;i++)
+        for(i=0;i<4096 && length>0;i++)
         {
             buf[i] = fgetc(file);
             length--;
         }
-        send(client,buf,(i+1),0);
+        send(client,buf,(i),0);
     }
+
+
 
 }
 
@@ -113,7 +119,7 @@ void noFound(int client , string version , string state)//404错误，找不到�
     char buf[1024];
     string msg = version + " " + state + " No Found\r\n";
     msgSend(client, buf, msg);
-    msgSend(client,buf,"Connection: keep-alive\r\n");
+    msgSend(client,buf,"Connection: close\r\n");
     msgSend(client,buf,"Content-type:text/html; charset=utf-8\r\n");
     msgSend(client,buf,"\r\n");
 //    sprintf(buf,"\r\n");
@@ -127,7 +133,7 @@ void noFound(int client , string version , string state)//404错误，找不到�
 void ok(int client , string version , string state)//200，正常返回信息
 {
     char buf[1024];
-    string msg = version + " " + state + " " +"OKKK\r\n";
+    string msg = version + " " + state + " " +"OK\r\n";
     msgSend(client,buf,msg);
 }
 
@@ -136,7 +142,7 @@ void inetServerError(int client , string version , string state)//最常见的�
     char buf[1024];
     string msg = version + " " + state + " " +"Internal Server Error\r\n";
     msgSend(client,buf,msg);
-    msgSend(client,buf,"Connection: keep-alive\r\n");
+    msgSend(client,buf,"Connection: close\r\n");
     msgSend(client,buf,"Content-type:text/html; charset=utf-8\r\n");
     msgSend(client,buf,"\r\n");
 }

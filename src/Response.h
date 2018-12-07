@@ -1,4 +1,4 @@
-#ifndef RESPONSE_H
+﻿#ifndef RESPONSE_H
 #define RESPONSE_H
 #include <stdio.h>
 #include <iostream>
