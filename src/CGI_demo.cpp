@@ -21,32 +21,35 @@ int main()
     string queryString = "var=1&b=1";
 
 
+
     // POST
     // HTTP 主体内容
-    string bodyContent = "a=1";
+    string bodyContent = "ry=tia";
     // contentLength
-    int contentLength = 3;
+    int contentLength = 6;
     // 请求方式
     string method = "POST";
+    // 如果页面没有传送 content type，一般 form 提交默认这个，否则直接解析为 POST 数组（非必传，CGI类有默认）
+    string contentType = "application/x-www-form-urlencoded";
 
 
-    CGI *get = new CGI(scriptName,fileName,requestUri,queryString);
+    // CGI *get = new CGI(scriptName,fileName,requestUri,queryString);
     
-    get->run();
-    cout<< get->getStatusCode() <<endl;
-    cout<< get->getOutput() <<endl;
+    // get->run();
+    // cout<< get->getStatusCode() <<endl;
+    // cout<< get->getOutput() <<endl;
 
-    delete(get);
+    // delete(get);
 
 
 
-    // CGI *post = new CGI(scriptName,fileName,requestUri,queryString);
+    CGI *post = new CGI(scriptName,fileName,requestUri,queryString);
 
-    // post->run(method, bodyContent, contentLength);
-    // cout<< post->getStatusCode() <<endl;
-    // cout<< post->getOutput() <<endl;
+    post->run(method, bodyContent, contentLength);
+    cout<< post->getStatusCode() <<endl;
+    cout<< post->getOutput() <<endl;
     
-    // delete(post);
+    delete(post);
     
     return 0;
 }

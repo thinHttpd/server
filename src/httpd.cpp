@@ -79,7 +79,7 @@ void accept_request(int client)
 	{
 		Response response(client, "404");
 		response.sendHttpHead();
-		cout << "[-]i will close client!" <<endl;
+		cout << "[-] I will close client!" <<endl;
 	//关闭连接
 	close(client);
 	}
@@ -94,7 +94,7 @@ void accept_request(int client)
 			{
 				Response response(client, "404");
 				response.sendHttpHead();
-				cout << "[-]i will close client!" <<endl;
+				cout << "[-] I will close client!" <<endl;
 				//关闭连接
 				close(client);
 			}
@@ -123,7 +123,6 @@ void accept_request(int client)
 			dog(client, p);
 		}
 	}
-	
 }
 
 
@@ -149,15 +148,16 @@ void dog(int client, const char* path)
 		response.sendContext(resource, n, "html");
 	}	
 	fclose(resource);
-	cout << "[-]i will close client!" <<endl;
 	//关闭连接
+	cout << "[*]" << client << endl;
 	close(client);
+	cout << "[-] I will close client!" <<endl;
 }
 
 //发送文件
 void *cat(void* data)
 {
-	cout << "[-]thread is sending" << endl;
+	cout << "[-] thread is sending" << endl;
 	struct files *fout = (struct files*) data;
 	FILE* resource = NULL;
 	string state_code = "404";
@@ -280,8 +280,8 @@ int main()
 	{
 		client_sock = accept(httpd, (struct sockaddr*)&c_sockaddr, &c_sockaddr_len);
 		if(client_sock == -1)
-			print_error("[-]error: accept error!");
-		cout << "[+]success: accept a request!" << endl;
+			print_error("[-] error: accept error!");
+		cout << "[+] Success: accept a request!" << endl;
 
 		int pid = fork();
 		if (pid == 0)
@@ -290,7 +290,7 @@ int main()
 			exit(0);
 		}
 		else {
-			printf("[+]create a new thread for %d \n",client_sock);
+			printf("[+] Create a new thread for %d \n",client_sock);
 		}
 
 		

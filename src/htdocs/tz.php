@@ -1,4 +1,2 @@
 <?php 
-for ($i=0; $i < 900; $i++) { 
-	echo "1";
-}
+echo json_encode($_REQUEST);
