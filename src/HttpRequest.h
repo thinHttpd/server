@@ -8,11 +8,12 @@
 
 #include <string>
 #include <map>
+#include <regex>
 #include <vector>
 
 class HttpRequest {
 private:
-    std::string mehtod;
+    std::string method;
     std::string version;
     std::string uri;
     std::string requsetBody;
@@ -72,7 +73,7 @@ private:
             if (reqs[i].size() > 0) {
                 for (int j = 0; j < reqs[i].size(); ++j) {
                     if(reqs[i][j] == ':'){
-                       pos = j;
+                        pos = j;
                         break;
                     }
                 }
@@ -94,21 +95,26 @@ private:
             /*vector<string> body;
             body.push_back(reqs[reqs.size() - 1]);
             res.insert(pair<string, vector<string>>("requestBody", body));*/
-        } else{
-            requsetBody = "";
+
         }
         return res;
     }
     void init(std::string req){
         headers = getRequestMap(req);
     }
+
 public:
     HttpRequest();
     HttpRequest(std::string req);
-
-    void setReq(std::string req);
     bool hasSource();
-    const std::string &getMehtod() const;
+    /**
+     * 获取访问资源后缀名 .html .py .php .jsp
+     * @return
+     */
+    std::vector<std::string> getSource();
+    void setReq(std::string req);
+
+    const std::string &getMethod() const;
 
     const std::string &getVersion() const;
 
@@ -117,31 +123,6 @@ public:
     const std::string &getRequsetBody() const;
 
     const std::map<std::string, std::vector<std::string>> &getHeaders() const;
-
-    /* std::string getMethod();
-
-     std::string getVersion();
-
-     std::string getUri();
-
-     std::string getUserAgent();
-
-     std::string getConnection();
-
-     std::string getReferer();
-
-     std::string getContentType();
-
-     std::string getRequestBody();
-
-     long getContentLength();
-
-     std::vector<std::string> getAccept();
-
-     std::vector<std::string> getAcceptLanguage();
-
-     std::vector<std::string> getAcceptEncoding();
- */
 
 };
 
