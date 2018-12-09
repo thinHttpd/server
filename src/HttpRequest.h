@@ -108,10 +108,10 @@ public:
     HttpRequest(std::string req);
     bool hasSource();
     /**
-     * 获取访问资源后缀名 .html .py .php .jsp
+     * uri访问资源后缀,uri ? 前最后一个资源的名字,如果没有后缀,返回空字符串
      * @return
      */
-    std::vector<std::string> getSource();
+    std::string getSource();
     void setReq(std::string req);
 
     const std::string &getMethod() const;

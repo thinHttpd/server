@@ -21,25 +21,16 @@ bool HttpRequest::hasSource() {
 }
 
 
-std::vector<std::string> HttpRequest::getSource(){
+std::string HttpRequest::getSource(){
     using namespace std;
     string uri = this->getUri();
-    vector<string> res;
-    regex reg1(".*\\.html(.*)");
-    regex reg2(".*\\.php(.*)");
-    regex reg3(".*\\.py(.*)");
-    regex reg4(".*\\.jsp(.*)");
-    if(regex_match(uri,reg1)){
-        res.push_back(".html");
-    }
-    if(regex_match(uri,reg2)){
-        res.push_back(".php");
-    }
-    if(regex_match(uri,reg3)){
-        res.push_back(".py");
-    }
-    if(regex_match(uri,reg4)){
-        res.push_back(".jsp");
+    string res="";
+    string::size_type pos;
+    vector<string> tmp;
+    splitString(uri,tmp,"?");
+    pos = tmp[0].find_last_of(".");
+    if(pos != string::npos){
+        res = tmp[0].substr(pos+1);
     }
     return res;
 }
