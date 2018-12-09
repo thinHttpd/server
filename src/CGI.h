@@ -7,7 +7,7 @@ class CGI
     public:
     	CGI(){};
     	~CGI(){};
-        CGI(std::string scriptName, std::string fileName, std::string requestUri, std::string queryString);
+        CGI(std::string fileName, std::string requestUri, std::string queryString);
         void run();
         void run(std::string method, std::string bodyContent, int contentLength, std::string contentType = "application/x-www-form-urlencoded");
         char * getOutput();

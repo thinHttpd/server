@@ -6,10 +6,9 @@
 #include "stdio.h"
 #include "unistd.h"
 
-CGI::CGI(std::string scriptName, std::string fileName, std::string requestUri, std::string queryString)
+CGI::CGI(std::string fileName, std::string requestUri, std::string queryString)
 {
     // 记录必要参数（可以看作CGI的上下文
-    this->m_scriptName = scriptName;
     this->m_fileName = fileName;
     this->m_requestUri = requestUri;
     this->m_queryString = queryString;

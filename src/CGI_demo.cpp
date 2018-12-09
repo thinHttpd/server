@@ -12,7 +12,7 @@ int main()
 
     // 基础的
     // 运行的文件名，这个要可能重新抽取出
-    string scriptName = "tz.php";
+    // string scriptName = "tz.php"; //这个可以不用
     // 具体的路径，一般是 ./htdocs + 请求时的 URI（并去掉?后面的内容）
     string fileName = "./htdocs/tz.php";
     // 请求的 request URI
@@ -33,7 +33,7 @@ int main()
     string contentType = "application/x-www-form-urlencoded";
 
 
-    // CGI *get = new CGI(scriptName,fileName,requestUri,queryString);
+    // CGI *get = new CGI(fileName,requestUri,queryString);
     
     // get->run();
     // cout<< get->getStatusCode() <<endl;
@@ -43,7 +43,7 @@ int main()
 
 
 
-    CGI *post = new CGI(scriptName,fileName,requestUri,queryString);
+    CGI *post = new CGI(fileName,requestUri,queryString);
 
     post->run(method, bodyContent, contentLength);
     cout<< post->getStatusCode() <<endl;
