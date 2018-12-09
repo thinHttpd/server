@@ -54,7 +54,7 @@ private:
         splitString(req, reqs, "\r\n");
         vector<string> reqLine;
         splitString(reqs[0], reqLine, " ");
-        mehtod = trim(reqLine[0]);
+        method = trim(reqLine[0]);
         uri = trim(reqLine[1]);
         version = trim(reqLine[2]);
         /*vector<string> tmp;
@@ -90,7 +90,7 @@ private:
             }
         }
         string p = "POST";
-        if (mehtod == p) {
+        if (method == p) {
             requsetBody = trim(reqs[reqs.size() - 1]);
             /*vector<string> body;
             body.push_back(reqs[reqs.size() - 1]);

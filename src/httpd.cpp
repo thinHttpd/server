@@ -26,8 +26,7 @@ struct files
 };
 
 void accept_request(int client);
-void *cat(void* data);
-void dog(int client, const char* path);
+void cat(int client, const char* path, const string file_type);
 int recvline(int sock, char *buf, int size);
 void getRequest(int client, string& buff);
 void print_error(const char* error_message);
@@ -102,32 +101,22 @@ void accept_request(int client)
 		//如果是可执行文件，需要cgi
 		if((st.st_mode & S_IXUSR) || (st.st_mode & S_IXGRP) || (st.st_mode & S_IXOTH))
 			cgi = 1;
+		string file_type = hr.getSource();
 		if(!cgi)
 		{
-			// fout.client = client;
-			// fout.path = p;
-			// int ret_thrd = pthread_create(&thread, NULL, cat, (void*)&fout);
-			// if(ret_thrd != 0)
-			// 	print_error("[-]thread error!");
-			dog(client, p);
+			cat(client, p, file_type);
 		}
 		else
 		{
 			// //调用cgi	
-			// cout << "[-]cgi diao!" << endl;
-			// fout.client = client;
-			// fout.path = p;
-			// int ret_thrd = pthread_create(&thread, NULL, cat, (void*)&fout);
-			// if(ret_thrd != 0)
-			// 	print_error("[-]thread error!");
-			dog(client, p);
+			cat(client, p, file_type);
 		}
 	}
 }
 
 
 //发送文件
-void dog(int client, const char* path)
+void cat(int client, const char* path, const string file_type)
 {
 	FILE* resource = NULL;
 	string state_code = "404";
@@ -145,7 +134,7 @@ void dog(int client, const char* path)
 		state_code = "200";
 		Response response(client, state_code);
 		response.sendHttpHead();
-		response.sendContext(resource, n, "html");
+		response.sendContext(resource, n, file_type);
 	}	
 	fclose(resource);
 	//关闭连接
@@ -154,34 +143,6 @@ void dog(int client, const char* path)
 	cout << "[-] I will close client!" <<endl;
 }
 
-//发送文件
-void *cat(void* data)
-{
-	cout << "[-] thread is sending" << endl;
-	struct files *fout = (struct files*) data;
-	FILE* resource = NULL;
-	string state_code = "404";
-	resource = fopen(fout->path, "rb");
-	if(resource == NULL)
-	{
-		Response response(fout->client, state_code);
-		response.sendHttpHead();
-	}
-	else
-	{
-		fseek(resource,0,SEEK_END);
-		long n = ftell(resource);	//获取文件长度
-		fseek(resource,0,SEEK_SET);
-		state_code = "200";
-		Response response(fout->client, state_code);
-		response.sendHttpHead();
-		response.sendContext(resource, n, "html");
-	}	
-	fclose(resource);
-	cout << "[-]i will close client" << fout->client << "!" <<endl;
-	//关闭连接
-	close(fout->client);
-}
 
 //取得一行请求数据
 int recvline(int sock, char *buff, int size)

@@ -62,7 +62,7 @@ void Response::sendHttpHead()//返回头部
   *
   * @todo: document this function
   */
-void Response::sendContext(FILE* file , long length , string type)//从文件描述符中读取指定内容
+void Response::sendContext(FILE* file , long length ,const string type)//从文件描述符中读取指定内容
 {
     char buf[4096];
 
@@ -92,7 +92,10 @@ void Response::sendContext(FILE* file , long length , string type)//从文件描
     {
         msgSend(client,buf,"Content-Type: image/png\r\n");
     }
-
+    else
+    {
+        msgSend(client,buf,"Content-Type: text/html; charset=utf-8\r\n");
+    }
 
     sprintf(buf,"Content-Length: %ld\r\n",length);
     send(client,buf,strlen(buf),0);
@@ -136,14 +139,14 @@ void noFound(int client , string version , string state)//404错误，找不到�
 void ok(int client , string version , string state)//200，正常返回信息
 {
     char buf[1024];
-    string msg = version + " " + state + " " +"OK\r\n";
+    string msg = version + " " + state +" OK\r\n";
     msgSend(client,buf,msg);
 }
 
 void inetServerError(int client , string version , string state)//最常见的服务器端错误
 {
     char buf[1024];
-    string msg = version + " " + state + " " +"Internal Server Error\r\n";
+    string msg = version + " " + state +" Internal Server Error\r\n";
     msgSend(client,buf,msg);
     msgSend(client,buf,"Connection: close\r\n");
     msgSend(client,buf,"Content-type:text/html; charset=utf-8\r\n");

@@ -39,7 +39,7 @@ void HttpRequest::setReq(std::string req){
 }
 
 const std::string &HttpRequest::getMethod() const {
-    return mehtod;
+    return method;
 }
 
 const std::string &HttpRequest::getVersion() const {
