@@ -126,14 +126,15 @@ void noFound(int client , string version , string state)//404错误，找不到�
     string msg = version + " " + state + " No Found\r\n";
     msgSend(client, buf, msg);
     msgSend(client,buf,"Connection: close\r\n");
-    msgSend(client,buf,"Content-type:text/html; charset=utf-8\r\n");
+    msgSend(client,buf,"Content-Length: 18\r\n");
+    msgSend(client,buf,"Content-Type: text/html; charset=utf-8\r\n");
     msgSend(client,buf,"\r\n");
 //    sprintf(buf,"\r\n");
 //    send(client,buf,sizeof(buf),0);
 //    msg = "<P>找不到资源哦 ";
 //    sprintf(buf,msg.c_str());
 //    send(client,buf,strlen(msg.c_str()),0);
-    msgSend(client, buf,"<P>找不到资源哦");
+    msgSend(client, buf,"<p>找不到资源哦</p>");
 }
 
 void ok(int client , string version , string state)//200，正常返回信息
@@ -149,6 +150,7 @@ void inetServerError(int client , string version , string state)//最常见的�
     string msg = version + " " + state +" Internal Server Error\r\n";
     msgSend(client,buf,msg);
     msgSend(client,buf,"Connection: close\r\n");
+    msgSend(client,buf,"Content-Length: 0\r\n");
     msgSend(client,buf,"Content-type:text/html; charset=utf-8\r\n");
     msgSend(client,buf,"\r\n");
 }

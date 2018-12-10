@@ -93,9 +93,10 @@ void accept_request(int client)
 	{
 		Response response(client, "404");
 		response.sendHttpHead();
+		cout << "[-] 404 Not Found!" <<endl;
 		cout << "[-] I will close client!" <<endl;
-	//关闭连接
-	close(client);
+		//关闭连接
+		close(client);
 	}
 	else
 	{	
@@ -108,15 +109,17 @@ void accept_request(int client)
 			{
 				Response response(client, "404");
 				response.sendHttpHead();
+				cout << "[-] 404 Not Found index" <<endl;
 				cout << "[-] I will close client!" <<endl;
 				//关闭连接
 				close(client);
 			}
 		}
-		//如果是可执行文件，需要cgi
-		if((st.st_mode & S_IXUSR) || (st.st_mode & S_IXGRP) || (st.st_mode & S_IXOTH))
-			cgi = 1;
 		string file_type = hr.getSource();
+		//如果是可执行文件，需要cgi
+		if((file_type == "php") || (file_type == "py") || (file_type == "jar"))
+			cgi = 1;
+		
 		if(!cgi)
 		{
 			cat(client, p, file_type);
@@ -302,7 +305,9 @@ int main()
 		if (pid == 0)
 		{
 			accept_request(client_sock);
+			cout<<"[-] Exiting thread.."<<endl;
 			exit(0);
+			cout<<"[-] Exit thread failed"<<endl;
 		}
 		else {
 			printf("[+] Create a new thread for %d \n",client_sock);
