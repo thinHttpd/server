@@ -13,6 +13,7 @@
 #include <vector>
 #include "HttpRequest.h"
 #include "Response.h"
+#include "CGI.h"
 #define QUEUE 20
 
 using namespace std;
@@ -29,6 +30,7 @@ void accept_request(int client);
 void cat(int client, const char* path, const string file_type);
 int recvline(int sock, char *buf, int size);
 void getRequest(int client, string& buff);
+void getBody(int sock, int length, string& buff);
 void print_error(const char* error_message);
 int create_connect(u_short* port);
 
@@ -37,7 +39,8 @@ void accept_request(int client)
 {
 	string method;		//请求方法
 	string buff;		//请求头
-	string url;
+	string uri;
+	string requesturi;
 	string version;
 	int cgi = 0;
 	string path = "htdocs";
@@ -46,6 +49,7 @@ void accept_request(int client)
 	pthread_t thread;
 	struct files fout;
 	//string state_code = "404";
+	string query_string = "";
 	//读取用户端发来的请求数据
 	getRequest(client, buff);
 	cout << buff << endl;
@@ -53,21 +57,32 @@ void accept_request(int client)
 	//取请求方法
 	method = hr.getMethod();
 	//
-	url = hr.getUri();
+	uri = hr.getUri();
+	requesturi = hr.getUri();
 	//
 	version = hr.getVersion();
 	//
 	map<string, vector<string>> headMap = hr.getHeaders();
 	//不是GET请求就需要cgi	
-	if(method == "GET")
+	if(method != "GET")
 		cgi = 1;
 	else	
 	{
 		//有参数就请求cgi
-		//if(hasQuery_string) cgi = 1;
+		if(hr.hasSource())
+		{
+			cgi = 1;
+			vector<string> tmp;
+    		hr.splitString(uri,tmp,"?");
+    		uri = tmp[0];
+    		query_string = tmp[1];
+			//get query_string = after ? of uri
+			//uri = before ? of uri
+			//requesturi = hr.getUri()
+		}
 	}
 	//拼接到htdocs的后面	
-	path += url;
+	path += uri;
 	
 	//假如path后是'/',需要寻找默认文件
 	if(path[path.length() - 1] == '/')
@@ -109,7 +124,32 @@ void accept_request(int client)
 		else
 		{
 			// //调用cgi	
-			cat(client, p, file_type);
+			cout << "[+]use cgi" << endl;
+			//cat(client, p, file_type);
+			int body_length = 0;
+			string body_content = "";
+			if(method == "GET")
+			{
+
+			}
+			else
+			{
+				map<string,vector<string>>::iterator iter;
+				iter = headMap.find("content-length");
+				body_length = stoi((iter->second)[0], nullptr);
+				//cout << body_length << endl;
+				getBody(client, body_length, body_content);
+			}
+			path = "./" + path;
+			cout << path <<endl;
+			cout << body_length << ":::::" << body_content <<endl;
+			cout << query_string << endl;
+			CGI *u_cgi = new CGI(path,requesturi,query_string);
+			u_cgi->run(method, body_content, body_length);
+  		    cout<< u_cgi->getStatusCode() <<endl;
+  		    cout<< u_cgi->getOutput() <<endl;
+  		    //delete(u_cgi);
+  		    close(client);
 		}
 	}
 }
@@ -181,6 +221,20 @@ void getRequest(int client, string& buff)
 		buff += str;
 		numline = recvline(client, linebuf, sizeof(linebuf)); 
 	}
+}
+
+void getBody(int sock, int length, string& buff)
+{
+	char *body_buf = new char[length+1];
+	char c;
+	for(int i=0;i<length;i++)
+	{
+		recv(sock, &c, 1, 0);
+		body_buf[i] = c;
+	}
+	string str(body_buf);
+	buff += str;
+	delete[] body_buf;
 }
 
 //错误处理
