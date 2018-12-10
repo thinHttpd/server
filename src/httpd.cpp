@@ -301,17 +301,19 @@ int main()
 			print_error("[-] error: accept error!");
 		cout << "[+] Success: accept a request!" << endl;
 
-		int pid = fork();
-		if (pid == 0)
-		{
+		// 开了多线程无法通过测试，无法自动断开连接，但是开了 CGI 速度上通过科学的“推测”将会快！
+
+		// int pid = fork();
+		// if (pid == 0)
+		// {
 			accept_request(client_sock);
 			cout<<"[-] Exiting thread.."<<endl;
-			exit(0);
+			//exit(0);
 			cout<<"[-] Exit thread failed"<<endl;
-		}
-		else {
-			printf("[+] Create a new thread for %d \n",client_sock);
-		}
+		// }
+		// else {
+		// 	printf("[+] Create a new thread for %d \n",client_sock);
+		// }
 
 		
 	}
