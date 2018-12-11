@@ -169,8 +169,8 @@ void inetServerError(int client , string version , string state)//最常见的�
     msgSend(client,buf,"<p>服务器故障，请稍后再试...</p>");
 }
 
-    void msgSend(int client, char* buf , string msg)//发送信息小函数
+void msgSend(int client, char* buf , string msg)//发送信息小函数
 {
-    sprintf(buf,msg.c_str());
+    sprintf(buf,"%s",msg.c_str());
     send(client,buf,strlen(msg.c_str()),0);
 }

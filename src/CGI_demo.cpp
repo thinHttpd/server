@@ -16,40 +16,40 @@ int main()
     // 具体的路径，一般是 ./htdocs + 请求时的 URI（并去掉?后面的内容）
     string fileName = "./htdocs/tz.php";
     // 请求的 request URI
-    string requestUri = "/tz.php?var=1";
+    string requestUri = "/tz.php?id=1";
     // queryString
-    string queryString = "var=1&b=1";
+    string queryString = "id=1";
 
 
 
     // POST
     // HTTP 主体内容
-    string bodyContent = "ry=tia";
+    string bodyContent = "";
     // contentLength
-    int contentLength = 6;
+    int contentLength = 0;
     // 请求方式
     string method = "POST";
     // 如果页面没有传送 content type，一般 form 提交默认这个，否则直接解析为 POST 数组（非必传，CGI类有默认）
     string contentType = "application/x-www-form-urlencoded";
 
 
-    // CGI *get = new CGI(fileName,requestUri,queryString);
+    CGI *get = new CGI(fileName,requestUri,queryString);
     
-    // get->run();
-    // cout<< get->getStatusCode() <<endl;
-    // cout<< get->getOutput() <<endl;
+    get->run();
+    cout<< get->getStatusCode() <<endl;
+    cout<< get->getOutput() <<endl;
 
-    // delete(get);
+    delete(get);
 
 
 
-    CGI *post = new CGI(fileName,requestUri,queryString);
+    // CGI *post = new CGI(fileName,requestUri,queryString);
 
-    post->run(method, bodyContent, contentLength);
-    cout<< post->getStatusCode() <<endl;
-    cout<< post->getOutput() <<endl;
+    // post->run(method, bodyContent, contentLength);
+    // cout<< post->getStatusCode() <<endl;
+    // cout<< post->getOutput() <<endl;
     
-    delete(post);
+    // delete(post);
     
     return 0;
 }
