@@ -9,10 +9,11 @@
 
 using namespace std;
 
-void msgSend(int client , char* _buf , string _msg,int length = 0);//发送信息小函数
+void msgSend(int client , char* _buf , string _msg);//发送信息小函数
 void noFound(int client , string version , string state);//404错误，找不到资源文件
 void ok(int client , string version , string state);//200，正常返回信息
 void inetServerError(int client , string version , string state);//最常见的服务器端错误
+
 
 Response::Response(int _client,string _state,string _version)
 {
@@ -119,6 +120,18 @@ void Response::sendContext(FILE* file , long length ,const string type)//从文�
 
 
 }
+/** @brief sendString
+  *
+  * @todo: document this function
+  */
+void Response::sendString(string msg, long length)//返回字符串内容（内部包含部分属性信息）
+{
+    char *buf = new char[length];
+    msgSend(client,buf,"Connection: close\r\n");
+    sprintf(buf,"Content-Length: %ld\r\n",length);
+    send(client,buf,strlen(buf),0);
+    msgSend(client,buf,msg);
+}
 
 void noFound(int client , string version , string state)//404错误，找不到资源文件
 {
@@ -156,8 +169,8 @@ void inetServerError(int client , string version , string state)//最常见的�
     msgSend(client,buf,"<p>服务器故障，请稍后再试...</p>");
 }
 
-    void msgSend(int client, char* buf , string msg,int length)//发送信息小函数
+    void msgSend(int client, char* buf , string msg)//发送信息小函数
 {
-    sprintf(buf,msg.c_str(),length);
+    sprintf(buf,msg.c_str());
     send(client,buf,strlen(msg.c_str()),0);
 }
