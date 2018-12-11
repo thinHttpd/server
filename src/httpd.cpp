@@ -131,9 +131,13 @@ void accept_request(int client)
 			//cat(client, p, file_type);
 			int body_length = 0;
 			string body_content = "";
+			path = "./" + path;
+			cout << path <<endl;
+			CGI *u_cgi = new CGI(path,requesturi,query_string);
 			if(method == "GET")
 			{
-
+				cout << query_string << endl;
+				u_cgi->run();
 			}
 			else
 			{
@@ -147,20 +151,17 @@ void accept_request(int client)
 				body_length = stoi((iter->second)[0], nullptr);
 				cout << body_length << endl;
 				getBody(client, body_length, body_content);
+			
+				cout << body_length << ":::::" << body_content <<endl;
+				u_cgi->run(method, body_content, body_length);
 			}
-			path = "./" + path;
-			cout << path <<endl;
-			cout << body_length << ":::::" << body_content <<endl;
-			cout << query_string << endl;
-			CGI *u_cgi = new CGI(path,requesturi,query_string);
-			u_cgi->run(method, body_content, body_length);
   		    if(u_cgi->getStatusCode() == 200)
   		    {
   		    	Response response(client, "200");
   		    	response.sendHttpHead();
-  		    	cout << "[-]mememem " << u_cgi->getOutput() << endl;
   		    	string send_str = u_cgi->getOutput();
-
+  		    	cout << "[-]mememem " << send_str << endl;
+  		    	//cout << "test" <<endl;
   		    	string::size_type pos = send_str.find_last_of("\r\n");
   		    	string res = "";
     			if(pos != string::npos){
@@ -169,7 +170,7 @@ void accept_request(int client)
   		    	long str_len = res.length();
 
   		    	cout << str_len <<endl;
-  		    	response.sendString(u_cgi->getOutput(), str_len);
+  		    	response.sendString(send_str, str_len);
   		    }
   		    else if(u_cgi->getStatusCode() == 500)
   		    {
