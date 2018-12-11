@@ -124,11 +124,11 @@ void Response::sendContext(FILE* file , long length ,const string type)//从文�
   *
   * @todo: document this function
   */
-void Response::sendString(string msg, long length)//返回字符串内容（内部包含部分属性信息）
+void Response::sendString(string msg, long body_Length)//返回字符串内容（内部包含部分属性信息）
 {
-    char *buf = new char[length];
+    char *buf = new char[msg.length()];
     msgSend(client,buf,"Connection: close\r\n");
-    sprintf(buf,"Content-Length: %ld\r\n",length);
+    sprintf(buf,"Content-Length: %ld\r\n",body_Length);
     send(client,buf,strlen(buf),0);
     msgSend(client,buf,msg);
 }
