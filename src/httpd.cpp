@@ -83,6 +83,7 @@ void accept_request(int client)
 	}
 	//拼接到htdocs的后面	
 	path += uri;
+	//cout << "[-]path: " << path << endl;
 	
 	//假如path后是'/',需要寻找默认文件
 	if(path[path.length() - 1] == '/')
@@ -119,7 +120,6 @@ void accept_request(int client)
 		//如果是可执行文件，需要cgi
 		if((file_type == "php") || (file_type == "py") || (file_type == "jar"))
 			cgi = 1;
-		
 		if(!cgi)
 		{
 			cat(client, p, file_type);
@@ -138,9 +138,14 @@ void accept_request(int client)
 			else
 			{
 				map<string,vector<string>>::iterator iter;
-				iter = headMap.find("content-length");
+				iter = headMap.find("Content-Length");
+				// not found Content-Length but have content-length
+				if(iter == headMap.end())
+				{
+					iter = headMap.find("content-length");
+				}
 				body_length = stoi((iter->second)[0], nullptr);
-				//cout << body_length << endl;
+				cout << body_length << endl;
 				getBody(client, body_length, body_content);
 			}
 			path = "./" + path;
@@ -149,8 +154,30 @@ void accept_request(int client)
 			cout << query_string << endl;
 			CGI *u_cgi = new CGI(path,requesturi,query_string);
 			u_cgi->run(method, body_content, body_length);
-  		    cout<< u_cgi->getStatusCode() <<endl;
-  		    cout<< u_cgi->getOutput() <<endl;
+  		    if(u_cgi->getStatusCode() == 200)
+  		    {
+  		    	Response response(client, "200");
+  		    	response.sendHttpHead();
+  		    	cout << "[-]mememem " << u_cgi->getOutput() << endl;
+  		    	string send_str = u_cgi->getOutput();
+
+  		    	string::size_type pos = send_str.find_last_of("\r\n");
+  		    	string res = "";
+    			if(pos != string::npos){
+        			res = send_str.substr(pos+1);
+    			}
+  		    	long str_len = res.length();
+
+  		    	cout << str_len <<endl;
+  		    	response.sendString(u_cgi->getOutput(), str_len);
+  		    }
+  		    else if(u_cgi->getStatusCode() == 500)
+  		    {
+  		    	Response response(client, "500");
+				response.sendHttpHead();
+				cout << "[-] 500 error" <<endl;
+				cout << "[-] I will close client!" <<endl;
+  		    }
   		    //delete(u_cgi);
   		    close(client);
 		}
@@ -303,17 +330,17 @@ int main()
 
 		// 开了多线程无法通过测试，无法自动断开连接，但是开了 CGI 速度上通过科学的“推测”将会快！
 
-		// int pid = fork();
-		// if (pid == 0)
-		// {
+		int pid = fork();
+		if (pid == 0)
+		{
 			accept_request(client_sock);
 			cout<<"[-] Exiting thread.."<<endl;
-			//exit(0);
+			exit(0);
 			cout<<"[-] Exit thread failed"<<endl;
-		// }
-		// else {
-		// 	printf("[+] Create a new thread for %d \n",client_sock);
-		// }
+		}
+		else {
+			printf("[+] Create a new thread for %d \n",client_sock);
+		}
 
 		
 	}
