@@ -1,4 +1,4 @@
-#include "Response.h"
+﻿#include "Response.h"
 #include <stdio.h>
 #include <iostream>
 #include <sys/socket.h>
@@ -150,9 +150,10 @@ void inetServerError(int client , string version , string state)//最常见的�
     string msg = version + " " + state +" Internal Server Error\r\n";
     msgSend(client,buf,msg);
     msgSend(client,buf,"Connection: close\r\n");
-    msgSend(client,buf,"Content-Length: 0\r\n");
+    msgSend(client,buf,"Content-Length: 43\r\n");
     msgSend(client,buf,"Content-type:text/html; charset=utf-8\r\n");
     msgSend(client,buf,"\r\n");
+    msgSend(client,buf,"<p>服务器故障，请稍后再试...</p>");
 }
 
     void msgSend(int client, char* buf , string msg,int length)//发送信息小函数
