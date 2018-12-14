@@ -20,11 +20,6 @@ using namespace std;
 
 string idx = "index.html";
 
-struct files
-{
-	int client;
-	const char* path;
-};
 
 void accept_request(int client);
 void cat(int client, const char* path, const string file_type);
@@ -47,7 +42,6 @@ void accept_request(int client)
 	int content_length = 0;
 	struct stat st;		//检测文件是否存在结构体
 	pthread_t thread;
-	struct files fout;
 	//string state_code = "404";
 	string query_string = "";
 	//读取用户端发来的请求数据
@@ -157,8 +151,6 @@ void accept_request(int client)
 			}
   		    if(u_cgi->getStatusCode() == 200)
   		    {
-  		    	Response response(client, "200");
-  		    	response.sendHttpHead();
   		    	string send_str = u_cgi->getOutput();
   		    	cout << "[-]mememem " << send_str << endl;
   		    	//cout << "test" <<endl;
@@ -168,7 +160,8 @@ void accept_request(int client)
         			res = send_str.substr(pos+1);
     			}
   		    	long str_len = res.length();
-
+  		    	Response response(client, "200");
+  		    	response.sendHttpHead();
   		    	cout << str_len <<endl;
   		    	response.sendString(send_str, str_len);
   		    }
